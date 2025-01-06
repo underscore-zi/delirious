@@ -99,7 +99,7 @@ public class AltElytraSources extends Module {
         esp.Entity(entity, opts);
 
         var coords = ChatUtils.formatCoords(entity.getPos());
-        MutableText text = Text.literal("Found a ").append(name).append(" at ").append(Text.of(coords));
+        MutableText text = Text.literal("Found a ").append(name).append(" at ").append(coords);
         ChatUtils.sendMsg("Alt Elytra", text);
 
 
