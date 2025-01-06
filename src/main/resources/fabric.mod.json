@@ -1,27 +1,26 @@
 {
   "schemaVersion": 1,
-  "id": "addon-template",
+  "id": "delirious",
   "version": "${version}",
-  "name": "Addon Template",
+  "name": "Delirious",
   "description": "An addon template for Meteor Client addons.",
   "authors": [
-    "seasnail"
+    "__zi"
   ],
   "contact": {
-    "repo": "https://github.com/MeteorDevelopment/meteor-addon-template"
+    "repo": "https://github.com/underscore-zi/delirious"
   },
   "icon": "assets/template/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "com.example.addon.AddonTemplate"
+      "us.ri0.deli.Addon"
     ]
   },
-  "mixins": [
-    "addon-template.mixins.json"
-  ],
+  "accessWidener": "addon.accesswidener",
+  "mixins": [],
   "custom": {
-    "meteor-client:color": "225,25,25"
+    "meteor-client:color": "135,62,35"
   },
   "depends": {
     "java": ">=21",
