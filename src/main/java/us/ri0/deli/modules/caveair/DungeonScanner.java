@@ -19,18 +19,17 @@ import us.ri0.deli.esp.EspOptions;
 
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class DungeonScanner {
-    private Esp esp;
-    private EspOptions opts;
+    private Consumer<DungeonScanFinding> callback;
 
     private final ConcurrentHashMap<BlockPos, Boolean> delayed = new ConcurrentHashMap<BlockPos, Boolean>();
 
-    public DungeonScanner(Esp newEsp, EspOptions newOpts) {
-        esp = newEsp;
-        opts = newOpts;
+    public DungeonScanner(Consumer<DungeonScanFinding> cb) {
+        callback = cb;
     }
 
     public void clear() {
@@ -153,13 +152,7 @@ public class DungeonScanner {
         // Check we had atleast some cave air to avoid false positives on old/updated chunks.
         if(discoveredCaveAir.isEmpty()) return;
 
-        discoveredAir.forEach(p -> esp.Block(p, opts));
-
-
-        MutableText coords = ChatUtils.formatCoords(Vec3d.of(spawner.getPos()));
-        Text msg = Text.literal("Found missing cave air around dungeon spawner at ").append(coords);
-
-        ChatUtils.sendMsg("CaveAir",  msg);
+        callback.accept(new DungeonScanFinding(spawner, discoveredAir, discoveredCaveAir));
     }
 
 

@@ -11,16 +11,15 @@ import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
 
 import java.util.HashSet;
+import java.util.function.Consumer;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class MineshaftCartScanner {
-    private Esp esp;
-    private EspOptions opts;
+    private Consumer<MinecartScanFinding> callback;
 
-    public MineshaftCartScanner(Esp esp, EspOptions opts) {
-        this.esp = esp;
-        this.opts = opts;
+    public MineshaftCartScanner(Consumer<MinecartScanFinding> cb) {
+        callback = cb;
     }
 
     /**
@@ -65,10 +64,7 @@ public class MineshaftCartScanner {
         if (discoveredAir.isEmpty()) return;
         if (discoveredCaveAir.isEmpty()) return;
 
-        for (BlockPos airPos : discoveredAir) {
-            esp.Block(airPos, opts);
-        }
-
+        callback.accept(new MinecartScanFinding(entity, discoveredAir, discoveredCaveAir));
     }
 
     /**

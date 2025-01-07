@@ -6,17 +6,26 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.WorldChunk;
 import us.ri0.deli.Addon;
+import us.ri0.deli.chunkutils.BlockUtils;
 import us.ri0.deli.chunkutils.ChunkUtils;
 import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
 
+import java.util.HashSet;
+
 public class MissingCaveAir extends Module {
+    private final String chatPrefix = "CaveAir";
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgDungeons = settings.createGroup("Dungeons Scans");
     private final SettingGroup sgMineshaft = settings.createGroup("Mineshaft Scans");
@@ -126,6 +135,11 @@ public class MissingCaveAir extends Module {
     );
 
     private final Esp esp = new Esp();
+    private final EspOptions dungeonOpts = new EspOptions();
+    private final EspOptions minecartOpts = new EspOptions();
+
+    private final HashSet<BlockPos> scannedCarts = new HashSet<>();
+
     private DungeonScanner dungeonScanner;
     private MineshaftCartScanner cartScanner;
 
@@ -140,12 +154,20 @@ public class MissingCaveAir extends Module {
 
         for (var entity : mc.world.getEntities()) {
             if (entity instanceof ChestMinecartEntity cart) {
+                synchronized (scannedCarts) {
+                    if (scannedCarts.contains(cart.getBlockPos())) continue;
+                    scannedCarts.add(cart.getBlockPos());
+                }
+
                 MeteorExecutor.execute(() -> {
                     cartScanner.scanEntity(cart);
                 });
             }
         }
 
+        synchronized (scannedCarts) {
+            scannedCarts.removeIf(pos -> !BlockUtils.isLoaded(pos));
+        }
     }
 
     @EventHandler
@@ -162,32 +184,66 @@ public class MissingCaveAir extends Module {
     }
 
 
-        @Override
+    @Override
     public void onActivate() {
-        var dungeonEspOpts = new EspOptions();
-        dungeonEspOpts.renderDistance = range;
-        dungeonEspOpts.sideColor = dungeonBoxColor;
-        dungeonEspOpts.lineColor = dungeonLineColor;
-        dungeonEspOpts.tracer = dungeonTracer;
-        dungeonEspOpts.tracerColor = dungeonTracerColor;
-        dungeonScanner = new DungeonScanner(esp, dungeonEspOpts);
+        dungeonOpts.renderDistance = range;
+        dungeonOpts.sideColor = dungeonBoxColor;
+        dungeonOpts.lineColor = dungeonLineColor;
+        dungeonOpts.tracer = dungeonTracer;
+        dungeonOpts.tracerColor = dungeonTracerColor;
+        dungeonScanner = new DungeonScanner(this::onDungeonFinding);
 
-        var minecartOpts = new EspOptions();
         minecartOpts.renderDistance = range;
         minecartOpts.sideColor = minecartBoxColor;
         minecartOpts.lineColor = minecartLineColor;
         minecartOpts.tracer = minecartTracer;
         minecartOpts.tracerColor = minecartTracerColor;
-        cartScanner = new MineshaftCartScanner(esp, minecartOpts);
+        cartScanner = new MineshaftCartScanner(this::onMinecartFinding);
 
         for(var c : Utils.chunks(true)) {
             onChunkData(new ChunkDataEvent((WorldChunk) c));
         }
     }
 
+    /**
+     * Callback for when the dungeon scanner has a positive finding
+     * @param finding
+     */
+    private void onDungeonFinding(DungeonScanFinding finding) {
+        finding.getMissingCaveAir().forEach(p -> esp.Block(p, dungeonOpts));
+
+        if (chatNotifications.get()) {
+            if(!esp.isNew(finding.getSpawner().getPos())) return;
+
+            var count = finding.getMissingCaveAir().size();
+            var coords = ChatUtils.formatCoords(Vec3d.of(finding.getSpawner().getPos()));
+            var message = Text.literal(String.format("Dungeon [%d block] at ", count)).append(coords);
+            ChatUtils.sendMsg(chatPrefix, message);
+        }
+    }
+
+    /**
+     * Callback for when the minecart scanner has a positive finding
+     * @param finding
+     */
+    private void onMinecartFinding(MinecartScanFinding finding) {
+        finding.getMissingCaveAir().forEach(p -> esp.Block(p, minecartOpts));
+
+        if (chatNotifications.get()) {
+            if(!esp.isNew(finding.getEntity().getBlockPos())) return;
+
+            var count = finding.getMissingCaveAir().size();
+            var coords = ChatUtils.formatCoords(finding.getEntity().getPos());
+            var message = Text.literal(String.format("Minecart [%d block] at ", count)).append(coords);
+            ChatUtils.sendMsg(chatPrefix, message);
+        }
+    }
+
+
     @Override
     public void onDeactivate() {
         esp.clear();
         dungeonScanner.clear();
+        scannedCarts.clear();
     }
 }
