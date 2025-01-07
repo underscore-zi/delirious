@@ -152,21 +152,23 @@ public class MissingCaveAir extends Module {
     public void onRender3d(Render3DEvent event) {
         esp.onRender3D(event);
 
-        for (var entity : mc.world.getEntities()) {
-            if (entity instanceof ChestMinecartEntity cart) {
-                synchronized (scannedCarts) {
-                    if (scannedCarts.contains(cart.getBlockPos())) continue;
-                    scannedCarts.add(cart.getBlockPos());
+        if(scanMinecarts.get()) {
+            for (var entity : mc.world.getEntities()) {
+                if (entity instanceof ChestMinecartEntity cart) {
+                    synchronized (scannedCarts) {
+                        if (scannedCarts.contains(cart.getBlockPos())) continue;
+                        scannedCarts.add(cart.getBlockPos());
+                    }
+
+                    MeteorExecutor.execute(() -> {
+                        cartScanner.scanEntity(cart);
+                    });
                 }
-
-                MeteorExecutor.execute(() -> {
-                    cartScanner.scanEntity(cart);
-                });
             }
-        }
 
-        synchronized (scannedCarts) {
-            scannedCarts.removeIf(pos -> !BlockUtils.isLoaded(pos));
+            synchronized (scannedCarts) {
+                scannedCarts.removeIf(pos -> !BlockUtils.isLoaded(pos));
+            }
         }
     }
 
