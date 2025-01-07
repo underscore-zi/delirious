@@ -7,6 +7,7 @@ import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import org.slf4j.Logger;
 import us.ri0.deli.modules.*;
+import us.ri0.deli.modules.caveair.MissingCaveAir;
 
 public class Addon extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
