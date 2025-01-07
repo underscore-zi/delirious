@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import us.ri0.deli.Addon;
+import us.ri0.deli.chunkutils.BlockUtils;
 import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
 
@@ -70,11 +71,14 @@ public class MinecartToucher extends Module {
         mc.world.getEntities().forEach(entity -> {
             if (!(entity instanceof ChestMinecartEntity)) return;
 
-            if (seen.containsKey(entity.getId())) return;
-            seen.put(entity.getId(), true);
-
             Vec3d pos = entity.getPos();
             if(Math.abs(pos.x % 1) != 0.5 || Math.abs(pos.z % 1) != 0.5) {
+                // Check for fluid collision
+                if(BlockUtils.isFluid(entity.getBlockPos().east())) return;
+                if(BlockUtils.isFluid(entity.getBlockPos().west())) return;
+                if(BlockUtils.isFluid(entity.getBlockPos().north())) return;
+                if(BlockUtils.isFluid(entity.getBlockPos().south())) return;
+
                 var bPos = entity.getBlockPos();
                 if(esp.isNew(bPos)) {
                     esp.Block(bPos, opts);
@@ -85,18 +89,7 @@ public class MinecartToucher extends Module {
                 }
             }
         });
-
-        if (Math.random() < 0.0005) prune();
         esp.onRender3D(event);
-    }
-
-    private void prune() {
-        seen.forEach((id, value) -> {
-            var e = mc.world.getEntityById(id);
-            if (e == null) {
-                seen.remove(id);
-            }
-        });
     }
 
     @Override
@@ -110,7 +103,6 @@ public class MinecartToucher extends Module {
     @Override
     public void onDeactivate() {
         esp.clear();
-        seen.clear();
     }
 
 
