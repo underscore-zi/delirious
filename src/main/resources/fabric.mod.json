@@ -20,7 +20,7 @@
   "accessWidener": "addon.accesswidener",
   "mixins": [],
   "custom": {
-    "meteor-client:color": "135,62,35"
+    "meteor-client:color": "255,61,35"
   },
   "depends": {
     "java": ">=21",
