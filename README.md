@@ -23,6 +23,10 @@ Once found, it scans where cave air should be in the room and alert when it find
 **Minecart Scan** - Detect chest minecarts in what is likely a mineshaft and scans for any unexpected air blocks. There 
 one is a bit more prone to false positives and false negatives because of the greater variation in mineshaft generation.
 
+**Touch Scan** - This looks for any air block that is adjacent to a cave_air block. As cave air generates in clumps an 
+air block in the middle of a clump is a sign of a player interaction. Though it can also just happen on the edges where
+the different types of airs meet. It might be useful if you're investigating an area though.
+
 #### False Positives
 
 No one likes to waste time on false alerts so I've made an effort to prefer false negatives to false positives. 
