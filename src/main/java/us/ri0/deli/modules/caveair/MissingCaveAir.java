@@ -49,6 +49,14 @@ public class MissingCaveAir extends Module {
         .build()
     );
 
+    private final Setting<Boolean> showCoords = sgGeneral.add(new BoolSetting.Builder()
+        .name("show-coords")
+        .description("Show the coords of the discovery in chat notification")
+        .defaultValue(true)
+        .visible(chatNotifications::get)
+        .build()
+    );
+
     private final Setting<Boolean> scanMinecarts = sgMineshaft.add(new BoolSetting.Builder()
         .name("scan-minecarts")
         .description("Scan area around minecarts for missing cave_air")
@@ -320,8 +328,13 @@ public class MissingCaveAir extends Module {
             if(!esp.isNew(finding.getSpawner().getPos())) return;
 
             var count = finding.getMissingCaveAir().size();
-            var coords = ChatUtils.formatCoords(Vec3d.of(finding.getSpawner().getPos()));
-            var message = Text.literal(String.format("Dungeon [%d block] at ", count)).append(coords);
+            var message = Text.literal(String.format("Dungeon [%d block]", count));
+
+            if(showCoords.get()) {
+                var coords = ChatUtils.formatCoords(Vec3d.of(finding.getSpawner().getPos()));
+                message.append(" at ").append(coords);
+            }
+
             ChatUtils.sendMsg(chatPrefix, message);
         }
     }
@@ -337,8 +350,13 @@ public class MissingCaveAir extends Module {
             if(!esp.isNew(finding.getEntity().getBlockPos())) return;
 
             var count = finding.getMissingCaveAir().size();
-            var coords = ChatUtils.formatCoords(finding.getEntity().getPos());
-            var message = Text.literal(String.format("Minecart [%d block] at ", count)).append(coords);
+            var message = Text.literal(String.format("Minecart [%d block]", count));
+
+            if(showCoords.get()) {
+                var coords = ChatUtils.formatCoords(finding.getEntity().getPos());
+                message.append(" at ").append(coords);
+            }
+
             ChatUtils.sendMsg(chatPrefix, message);
         }
     }
