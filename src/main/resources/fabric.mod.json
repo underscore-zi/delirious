@@ -3,7 +3,7 @@
   "id": "delirious",
   "version": "${version}",
   "name": "Delirious",
-  "description": "An addon template for Meteor Client addons.",
+  "description": "A Meteor addon by __zi containing whatever he finds useful and interesting.",
   "authors": [
     "__zi"
   ],
