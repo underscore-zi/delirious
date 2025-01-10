@@ -10,7 +10,8 @@
 
 ### MinecartToucher (2025-01-06)
 
-Pretty simple idea, when carts are generated/placed they are on position 0.5 of the block. When on rails like 
+Pretty simple idea, when carts are generated/placed they are on position 0.5 of the block. They can easily be pushed out
+of that .5 alignment to a position without visually looking out of place.
 
 ### MissingCaveAir (2025-01-04)
 

@@ -11,7 +11,6 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -102,6 +101,13 @@ public class MissingCaveAir extends Module {
         .name("scan-dungeons")
         .description("Scan area around dungeon spawners for missing cave_air")
         .defaultValue(true)
+        .build()
+    );
+    private final Setting<Boolean> onlyScanActivated = sgDungeons.add(new BoolSetting.Builder()
+        .name("only-scan-activated")
+        .description("Only scan dungeon with activated spawners")
+        .defaultValue(true)
+        .visible(scanDungeons::get)
         .build()
     );
 
@@ -322,6 +328,11 @@ public class MissingCaveAir extends Module {
      * @param finding
      */
     private void onDungeonFinding(DungeonScanFinding finding) {
+        if(onlyScanActivated.get()) {
+            var spawnDelay = finding.getSpawner().getLogic().spawnDelay;
+            if(spawnDelay == 20) return;
+        }
+
         finding.getMissingCaveAir().forEach(p -> esp.Block(p, dungeonOpts));
 
         if (chatNotifications.get()) {
