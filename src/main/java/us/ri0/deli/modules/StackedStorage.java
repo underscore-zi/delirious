@@ -37,9 +37,10 @@ public class StackedStorage extends Module {
     );
 
     private final Setting<Boolean> chatCoords = sgGeneral.add(new BoolSetting.Builder()
-        .name("chat-coords")
+        .name("include-coords-in-chat")
         .description("Include coordinates in chat notification")
         .defaultValue(true)
+        .visible(chatNotification::get)
         .build()
     );
 
