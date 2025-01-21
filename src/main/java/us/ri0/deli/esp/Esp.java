@@ -73,7 +73,7 @@ public class Esp {
         MeteorExecutor.execute(this::prune);
     }
 
-    public void prune() {
+    private void prune() {
         blocks.entrySet().removeIf(entry -> mc.player.getBlockPos().getChebyshevDistance(entry.getKey().withY(mc.player.getBlockPos().getY())) > entry.getValue().renderDistance.get() * 16);
     }
 
@@ -82,5 +82,16 @@ public class Esp {
         entities.clear();
     }
 
+    public void remove(BlockPos pos) {
+        blocks.remove(pos);
+    }
+
+    public void remove(int id) {
+        entities.remove(id);
+    }
+
+    public void remove(net.minecraft.entity.Entity entity) {
+        remove(entity.getId());
+    }
 
 }
