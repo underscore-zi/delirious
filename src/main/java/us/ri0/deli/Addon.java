@@ -20,6 +20,7 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new MissingCaveAir());
         Modules.get().add(new AltElytraSources());
         Modules.get().add(new MinecartToucher());
+        Modules.get().add(new StackedStorage());
     }
 
     @Override
