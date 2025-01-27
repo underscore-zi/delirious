@@ -79,6 +79,13 @@ public class MinecartToucher extends Module {
                 if(BlockUtils.isFluid(entity.getBlockPos().north())) return;
                 if(BlockUtils.isFluid(entity.getBlockPos().south())) return;
 
+                // Also check diagonals
+                if(BlockUtils.isFluid(entity.getBlockPos().north().east())) return;
+                if(BlockUtils.isFluid(entity.getBlockPos().north().west())) return;
+                if(BlockUtils.isFluid(entity.getBlockPos().south().east())) return;
+                if(BlockUtils.isFluid(entity.getBlockPos().south().west())) return;
+
+
                 var bPos = entity.getBlockPos();
                 if(esp.isNew(bPos)) {
                     esp.Block(bPos, opts);
