@@ -8,6 +8,16 @@
 
 ## Modules
 
+### DisplacedStack (2025-01-28)
+
+Highlight displaced blocks around minecarts and dungeon spawners. A displaced block is one that is entirely surrounded by
+blocks of another type. Like if someone stacked up on cobblestone after digging down to a chest. There is no alert on 
+finding these as there can be many false positives but the human eye should be able to tell what looks suspicious or not.
+
+### StackedStorage (2025-01-10)
+
+Just give you an alert when coming across a storage minecart that is stacked in the same position as another minecart.
+
 ### MinecartToucher (2025-01-06)
 
 Pretty simple idea, when carts are generated/placed they are on position 0.5 of the block. They can easily be pushed out

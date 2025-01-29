@@ -4,6 +4,7 @@ import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
 import meteordevelopment.meteorclient.utils.render.RenderUtils;
+import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 
@@ -16,6 +17,29 @@ public class Esp {
     private final ConcurrentHashMap<Integer, EspOptions> entities = new ConcurrentHashMap<Integer, EspOptions>();
 
     public void Block(BlockPos pos, EspOptions opts) {
+        blocks.put(pos, opts);
+    }
+
+    /**
+     * Highlights a block using the map color of the block.
+     * @param pos
+     */
+    public void BlockWithMapColor(BlockPos pos) {
+        EspOptions opts = new EspOptions();
+
+        var state = mc.world.getBlockState(pos);
+        var color = state.getMapColor(mc.world, pos);
+        if(color == null) color = state.getBlock().getDefaultMapColor();
+
+        // convert int to rgb
+        int r = (color.color >> 16) & 0xFF;
+        int g = (color.color >> 8) & 0xFF;
+        int b = color.color & 0xFF;
+
+        opts.tracer = new MockSetting<Boolean>(false);
+        opts.lineColor = new MockSetting<SettingColor>(new SettingColor(r, g, b));
+        opts.sideColor = new MockSetting<SettingColor>(new SettingColor(r, g, b, 40));
+
         blocks.put(pos, opts);
     }
 
