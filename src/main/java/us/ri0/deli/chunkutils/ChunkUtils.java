@@ -1,12 +1,16 @@
 package us.ri0.deli.chunkutils;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.predicate.block.BlockPredicate;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 
 import java.util.HashSet;
+
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class ChunkUtils {
 
@@ -73,5 +77,20 @@ public class ChunkUtils {
             }
         }
         return positions;
+    }
+
+    public static boolean areNeighborsLoaded(ChunkPos pos) {
+        return mc.world.isChunkLoaded(pos.x - 1, pos.z) &&
+            mc.world.isChunkLoaded(pos.x + 1, pos.z) &&
+            mc.world.isChunkLoaded(pos.x, pos.z - 1) &&
+            mc.world.isChunkLoaded(pos.x, pos.z + 1);
+    }
+
+    public static boolean areNeighborsLoaded(Chunk chunk) {
+        return areNeighborsLoaded(chunk.getPos());
+    }
+
+    public static boolean areNeighborsLoaded(BlockPos pos) {
+        return areNeighborsLoaded(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
     }
 }

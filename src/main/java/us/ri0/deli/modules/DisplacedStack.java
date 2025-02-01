@@ -17,6 +17,7 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
@@ -27,8 +28,10 @@ import us.ri0.deli.esp.EspOptions;
 import us.ri0.deli.esp.MockSetting;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DisplacedStack extends Module {
     public DisplacedStack() {
@@ -138,7 +141,12 @@ public class DisplacedStack extends Module {
         .build()
     );
 
+    private final ReentrantLock lock = new ReentrantLock();
     private final ConcurrentHashMap<BlockPos, ScanResult> scanCache = new ConcurrentHashMap<>();
+
+    // seenChunks should only be used while holding the `lock`
+    private final HashMap<ChunkPos, Boolean> seenChunks = new HashMap<>();
+
     private final Esp esp = new Esp();
 
     @EventHandler
@@ -148,9 +156,28 @@ public class DisplacedStack extends Module {
 
     @EventHandler
     public void onChunkData(ChunkDataEvent event) {
-        MeteorExecutor.execute(() -> {
-            scanChunk(event.chunk());
-        });
+        if(doDungeonScan.get()) {
+            MeteorExecutor.execute(this::processChunks);
+        }
+    }
+
+    public void processChunks() {
+        if(!lock.tryLock()) return;
+
+        try {
+            seenChunks.replaceAll((k, v) -> false);
+            Utils.chunks(true).forEach((c) -> {
+                if (!seenChunks.containsKey(c.getPos())) {
+                    scanChunk(c);
+                }
+                seenChunks.put(c.getPos(), true);
+            });
+            seenChunks.entrySet().removeIf((e) -> !e.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @EventHandler
@@ -205,8 +232,6 @@ public class DisplacedStack extends Module {
 
 
     public void scanChunk(Chunk chunk) {
-        if(!doDungeonScan.get()) return;
-
         int radius = scanRadius.get();
         int minDisturbance = disturbanceThreshold.get();
 
@@ -222,14 +247,17 @@ public class DisplacedStack extends Module {
                 var entity = mc.world.getBlockEntity(pos, BlockEntityType.MOB_SPAWNER);
                 if (entity.isEmpty()) return;
 
-                var spawner = (MobSpawnerBlockEntity) entity.get();
-                if(spawner.getLogic().spawnDelay == 20) return;
+                if(entity.get() instanceof MobSpawnerBlockEntity spawner) {
+                    if (spawner.getLogic().spawnDelay == 20) return;
+                } else {
+                    // Not a mob spawner?
+                    return;
+                }
             }
 
-            if(results.stacks.isEmpty()) return;
             if(results.minimumYDistance() > maximumYDistance.get()) return;
-            espResults(results);
 
+            espResults(results);
             if (doChatNotif.get()) {
                 MutableText msg = Text.literal("Dungeon with disturbance");
                 if(includeCoords.get()) {
@@ -238,7 +266,6 @@ public class DisplacedStack extends Module {
                 ChatUtils.sendMsg("DisplacedStack",  msg);
             }
         });
-
     }
 
     /**
@@ -342,6 +369,7 @@ public class DisplacedStack extends Module {
     @Override
     public void onActivate() {
         scanCache.clear();
+
         for(var c : Utils.chunks(true)) {
             onChunkData(new ChunkDataEvent((WorldChunk) c));
         }
@@ -356,6 +384,7 @@ public class DisplacedStack extends Module {
     public void onDeactivate() {
         esp.clear();
         scanCache.clear();
+        seenChunks.clear();
     }
 
     public class ScanResult {
