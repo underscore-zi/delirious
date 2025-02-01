@@ -4,6 +4,8 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 
+import static meteordevelopment.meteorclient.MeteorClient.mc;
+
 public class EspOptions {
     public Setting<Boolean> tracer;
     public Setting<SettingColor> tracerColor;
@@ -19,6 +21,6 @@ public class EspOptions {
         lineColor = new MockSetting<SettingColor>(new SettingColor(255, 0, 0));
         sideColor = new MockSetting<SettingColor>(new SettingColor(255, 0, 0, 50));
         mode = new MockSetting<ShapeMode>(ShapeMode.Both);
-        renderDistance = new MockSetting<Integer>(15);
+        renderDistance = new MockSetting<Integer>(mc.options.getViewDistance().getValue() * 2);
     }
 }
