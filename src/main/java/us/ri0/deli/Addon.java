@@ -22,6 +22,7 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new MinecartToucher());
         Modules.get().add(new StackedStorage());
         Modules.get().add(new DisplacedStack());
+        Modules.get().add(new AreaLoader());
     }
 
     @Override

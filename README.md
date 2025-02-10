@@ -8,6 +8,12 @@
 
 ## Modules
 
+### AreaLoader (2025-02-10)
+
+Spirals around your current position loading in chunks with an ever widening radius. Useful for checking out potential
+portal skip locations to see if you can find the overworld path. This requires a Baritone patch that isn't yet public 
+for non-nether elytra flying.
+
 ### DisplacedStack (2025-01-28)
 
 Highlight displaced blocks around minecarts and dungeon spawners. A displaced block is one that is entirely surrounded by
