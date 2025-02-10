@@ -60,7 +60,10 @@ public class AreaLoader extends Module {
 
     @EventHandler
     public void onTick(TickEvent.Post event) {
-        if(efly == null || !efly.isActive()) return;
+        if(efly == null || !efly.isActive()) {
+            this.toggle();
+            return;
+        }
 
         var pos = mc.player.getBlockPos();
         var dest = efly.currentDestination();
@@ -98,7 +101,7 @@ public class AreaLoader extends Module {
     public void onActivate() {
         if(PlayerUtils.getDimension() == Dimension.Nether) {
             ChatUtils.errorPrefix("area-loader", "This module is not supported in the nether");
-            Modules.get().get(this.getClass()).toggle();
+            this.toggle();
             return;
         }
 
