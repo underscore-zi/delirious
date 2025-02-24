@@ -263,8 +263,9 @@ public class DisplacedStack extends Module {
             if (doChatNotif.get()) {
                 MutableText msg = Text.literal("Dungeon with disturbance");
                 if(includeCoords.get()) {
-                    msg = msg.append(" at ").append(ChatUtils.formatCoords(results.pos.toCenterPos()));
+                    msg = msg.append(" at ").append(TextUtils.coords(results.pos.toCenterPos()));
                 }
+                msg = msg.append(TextUtils.circleCommandLink(results.pos.toCenterPos()));
                 ChatUtils.sendMsg("DisplacedStack",  msg);
             }
         });
