@@ -22,6 +22,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 import us.ri0.deli.Addon;
+import us.ri0.deli.TextUtils;
 import us.ri0.deli.chunkutils.ChunkUtils;
 import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
@@ -206,8 +207,9 @@ public class DisplacedStack extends Module {
         if (doChatNotif.get()) {
             MutableText msg = Text.literal("Minecart with disturbance");
             if(includeCoords.get()) {
-                msg = msg.append(" at ").append(ChatUtils.formatCoords(results.pos.toCenterPos()));
+                msg = msg.append(" at ").append(TextUtils.coords(results.pos.toCenterPos()));
             }
+            msg = msg.append(TextUtils.circleCommandLink(results.pos.toCenterPos()));
             ChatUtils.sendMsg("DisplacedStack",  msg);
         }
     }

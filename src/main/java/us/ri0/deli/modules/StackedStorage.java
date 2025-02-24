@@ -16,6 +16,7 @@ import net.minecraft.entity.vehicle.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import us.ri0.deli.Addon;
+import us.ri0.deli.TextUtils;
 import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
 
@@ -115,9 +116,10 @@ public class StackedStorage extends Module {
             if(chatNotification.get()) {
                 var message = Text.literal(String.format("Detected %d stacked storage entities", count));
                 if(chatCoords.get()) {
-                    var coords = ChatUtils.formatCoords(pos.toCenterPos());
+                    var coords = TextUtils.coords(pos.toCenterPos());
                     message.append(" at ").append(coords);
                 }
+                message.append(TextUtils.circleCommandLink(pos.toCenterPos()));
                 ChatUtils.sendMsg("StackedStorage", message);
             }
         }

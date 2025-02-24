@@ -15,6 +15,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import us.ri0.deli.Addon;
+import us.ri0.deli.TextUtils;
 import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
 
@@ -98,8 +99,10 @@ public class AltElytraSources extends Module {
 
         esp.Entity(entity, opts);
 
-        var coords = ChatUtils.formatCoords(entity.getPos());
-        MutableText text = Text.literal("Found a ").append(name).append(" at ").append(coords);
+        var coords = TextUtils.coords(entity.getPos());
+        MutableText text = Text.literal("Found a ")
+            .append(name).append(" at ").append(coords)
+            .append(TextUtils.circleCommandLink(entity.getPos()));
         ChatUtils.sendMsg("Alt Elytra", text);
 
 

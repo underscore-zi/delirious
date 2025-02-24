@@ -11,9 +11,9 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import us.ri0.deli.Addon;
+import us.ri0.deli.TextUtils;
 import us.ri0.deli.chunkutils.BlockUtils;
 import us.ri0.deli.esp.Esp;
 import us.ri0.deli.esp.EspOptions;
@@ -90,7 +90,9 @@ public class MinecartToucher extends Module {
                 if(esp.isNew(bPos)) {
                     esp.Block(bPos, opts);
                     if (chatNotification.get()) {
-                        Text msg = Text.literal("Minecart was touched at ").append(ChatUtils.formatCoords(bPos.toCenterPos()));
+                        var btn = TextUtils.circleCommandLink(bPos.toCenterPos());
+                        var coords = TextUtils.coords(bPos.toCenterPos());
+                        Text msg = Text.literal("Minecart was touched at ").append(coords).append(btn);
                         ChatUtils.sendMsg("CartToucher",  msg);
                     }
                 }
