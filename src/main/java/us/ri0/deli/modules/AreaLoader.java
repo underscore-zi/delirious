@@ -2,13 +2,19 @@ package us.ri0.deli.modules;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.process.IElytraProcess;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import us.ri0.deli.Addon;
 
 public class AreaLoader extends Module {
@@ -44,24 +50,38 @@ public class AreaLoader extends Module {
     };
     private int multiIndex = 0;
     private BlockPos lastDest = null;
+    private RegistryEntry<DimensionType> dimension;
+    private boolean dimensionChanged = false;
 
 
     private void reset() {
         multiIndex = 0;
         sideDistance = 16 * gapDistance.get();
-
         efly = BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess();
     }
 
     @EventHandler
     public void onTick(TickEvent.Post event) {
-        if(efly == null || !efly.isActive()) {
+        if(efly == null || !efly.isLoaded()) {
             this.toggle();
             return;
         }
 
+        if(mc.world.getDimensionEntry() != dimension) {
+            if(dimensionChanged) return;
+
+            dimensionChanged = true;
+            ChatUtils.sendMsg("area-loader", Text.literal("Dimension changed, pausing."));
+            return;
+        } else if (dimensionChanged) {
+            dimensionChanged = false;
+            ChatUtils.sendMsg("area-loader", Text.literal("Resuming."))            ;
+            efly.pathTo(lastDest);
+        }
+
         var pos = mc.player.getBlockPos();
         var dest = efly.currentDestination();
+        if(dest == null) return;
 
         var deltaX = Math.abs(pos.getX() - dest.getX());
         var deltaY = Math.abs(pos.getZ() - dest.getZ());
@@ -97,7 +117,7 @@ public class AreaLoader extends Module {
     @Override
     public void onActivate() {
         this.reset();
-
+        dimension = mc.world.getDimensionEntry();
         lastDest = getNextDestination(mc.player.getBlockPos());
         efly.pathTo(lastDest);
     }
