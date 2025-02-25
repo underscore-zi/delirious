@@ -2,16 +2,11 @@ package us.ri0.deli.modules;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.process.IElytraProcess;
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
-import meteordevelopment.meteorclient.utils.world.Dimension;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.math.BlockPos;
 import us.ri0.deli.Addon;
@@ -71,7 +66,7 @@ public class AreaLoader extends Module {
         var deltaX = Math.abs(pos.getX() - dest.getX());
         var deltaY = Math.abs(pos.getZ() - dest.getZ());
 
-        if(deltaX < 50 && deltaY < 50) {
+        if(deltaX < 60 && deltaY < 60) {
             lastDest = getNextDestination(dest);
             efly.pathTo(lastDest);
         }
@@ -97,14 +92,10 @@ public class AreaLoader extends Module {
         if(efly == null || !efly.isActive()) return;
         BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("stop");
     }
+
+
     @Override
     public void onActivate() {
-        if(PlayerUtils.getDimension() == Dimension.Nether) {
-            ChatUtils.errorPrefix("area-loader", "This module is not supported in the nether");
-            this.toggle();
-            return;
-        }
-
         this.reset();
 
         lastDest = getNextDestination(mc.player.getBlockPos());
