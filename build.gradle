@@ -10,12 +10,15 @@ base {
 
 repositories {
     maven {
-        name = "Meteor Dev Releases"
-        url = "https://maven.meteordev.org/releases"
+        name = "meteor-maven"
+        url = uri("https://maven.meteordev.org/releases")
     }
     maven {
-        name = "Meteor Dev Snapshots"
-        url = "https://maven.meteordev.org/snapshots"
+        name = "meteor-maven-snapshots"
+        url = uri("https://maven.meteordev.org/snapshots")
+    }
+    flatDir {
+        dirs '.local/libs'
     }
 }
 
@@ -31,6 +34,7 @@ dependencies {
 
     // Meteor
     modImplementation "meteordevelopment:meteor-client:${project.minecraft_version}-SNAPSHOT"
+    modCompileOnly("meteordevelopment:baritone:${project.baritone_version}-SNAPSHOT")
 }
 
 tasks {
