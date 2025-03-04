@@ -28,6 +28,7 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new AreaLoader());
         Modules.get().add(new CirclePosition());
         Commands.add(new CirclePositionCommand());
+        Modules.get().add(new AutoEnchant());
     }
 
     @Override

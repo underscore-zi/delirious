@@ -8,6 +8,12 @@
 
 ## Modules
 
+### AutoEnchant (2025-03-04)
+
+Automatically enchants items in your inventory, can use KillAurua to regain experieince if needed. This is a bit of a 
+process as it does not try to minimize the experieince needed through enchantment ordering. It also does not check the 
+level of the books its using, it assumes if you have a book matching the desired enchantment it is the level you want.
+
 ### AreaLoader (2025-02-10)
 
 Spirals around your current position loading in chunks with an ever widening radius. Useful for checking out potential
