@@ -8,11 +8,13 @@
 
 ## Modules
 
-### AutoEnchant (2025-03-04)
+### AutoAnvil (2025-03-18)
 
-Automatically enchants items in your inventory, can use KillAurua to regain experieince if needed. This is a bit of a 
-process as it does not try to minimize the experieince needed through enchantment ordering. It also does not check the 
-level of the books its using, it assumes if you have a book matching the desired enchantment it is the level you want.
+AutoEnchat basically. have a bunch of unenchanted items and necessary books in your inventory (or optionally in chests,
+and shulkers nearby (not barrels or other storage options)) and it will attempt to enchant everything. If you park it at 
+an XP farm while you do this it'll also it can turn on Kill Aura and wait for the player to reach the right XP level. 
+Lastly it can drop the freshly enchanted item at its feet for a hopper to pick up to keep your inventory clear making it
+possible to AFK with this.
 
 ### AreaLoader (2025-02-10)
 

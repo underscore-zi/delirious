@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import us.ri0.deli.commands.CirclePositionCommand;
 import us.ri0.deli.modules.*;
 import us.ri0.deli.modules.CirclePosition;
+import us.ri0.deli.modules.autoanvil.AutoAnvil;
 import us.ri0.deli.modules.caveair.MissingCaveAir;
 
 public class Addon extends MeteorAddon {
@@ -28,7 +29,9 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new AreaLoader());
         Modules.get().add(new CirclePosition());
         Commands.add(new CirclePositionCommand());
-        Modules.get().add(new AutoEnchant());
+        //Modules.get().add(new AutoEnchant());
+        //Modules.get().add(new PortalBuilder());
+        Modules.get().add(new AutoAnvil());
     }
 
     @Override
