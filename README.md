@@ -8,6 +8,11 @@
 
 ## Modules
 
+### Bonemeal Farmer (2025-03-20)
+
+Put seeds and bonemeal in your hotbar and face tilled dirt right in front of you. It will plant, bonemeal, harvest, and 
+repeat. Is it efficient? Absolutely not, but if you've got bonemeal but no crop, it works in a pinch. 
+
 ### AutoAnvil (2025-03-18)
 
 AutoEnchat basically. have a bunch of unenchanted items and necessary books in your inventory (or optionally in chests,
