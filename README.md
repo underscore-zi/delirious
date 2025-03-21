@@ -8,12 +8,6 @@
 
 ## Modules
 
-### AutoWheatBread (2025-03-20)
-
-Another stupid implementation just adding becauase it works for me. When you're holding wheat in your main hand it will
-try to bread any animals in reach. Not very well tested, really just use it on cows. Only supports wheat but not hard to
-expand to work with more.
-
 ### Bonemeal Farmer (2025-03-20)
 
 Put seeds and bonemeal in your hotbar and face tilled dirt right in front of you. It will plant, bonemeal, harvest, and 
