@@ -33,6 +33,6 @@ jobs:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           automatic_release_tag: latest
           prerelease: true
-          title: Delirious for Minecraft {{ env.MINECRAFT_VERSION }}
+          title: Delirious for Minecraft ${{ env.MINECRAFT_VERSION }}
           files: |
             ./build/libs/*.jar
