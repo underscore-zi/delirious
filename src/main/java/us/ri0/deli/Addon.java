@@ -29,11 +29,11 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new AreaLoader());
         Modules.get().add(new CirclePosition());
         Commands.add(new CirclePositionCommand());
-        //Modules.get().add(new AutoEnchant());
-        //Modules.get().add(new PortalBuilder());
         Modules.get().add(new AutoAnvil());
-        //Modules.get().add(new ChatPoC());
         Modules.get().add(new BonemealFarmer());
+        Modules.get().add(new AutoBreed());
+
+        //Modules.get().add(new PortalBuilder());
     }
 
     @Override
