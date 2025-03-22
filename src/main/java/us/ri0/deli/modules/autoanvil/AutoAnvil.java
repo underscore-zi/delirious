@@ -96,6 +96,10 @@ public class AutoAnvil extends Module {
     public final Setting<Boolean> enchantHoes = sgToolEnables.add(new BoolSetting.Builder().name("enchant-hoes").description("Enchant hoes").defaultValue(false).build());
     public final Setting<EHoePlans> hoePlan = sgToolEnchantmentPlans.add(new EnumSetting.Builder<EHoePlans>().name("hoe-plan").description("The enchantment plans to use for hoes").defaultValue(EHoePlans.FortuneTool.FortuneTool).visible(enchantHoes::get).build());
 
+    // shears
+    public final Setting<Boolean> enchantShears = sgToolEnables.add(new BoolSetting.Builder().name("enchant-shears").description("Enchant shears").defaultValue(false).build());
+    public final Setting<EShearsPlans> shearsPlan = sgToolEnchantmentPlans.add(new EnumSetting.Builder<EShearsPlans>().name("shears-plan").description("The enchantment plans to use for shears").defaultValue(EShearsPlans.FullEnchantedShears).visible(enchantShears::get).build());
+
     /** Weapons **/
 
     // sword

@@ -82,6 +82,11 @@ public class Context {
             if(doNether) items.add(Items.NETHERITE_HOE);
         }
 
+        // Shears
+        if(module.enchantShears.get()) {
+            items.add(Items.SHEARS);
+        }
+
         /* Armor */
 
         // Helmets
@@ -129,6 +134,8 @@ public class Context {
             return module.shovelPlan.get().plan();
         } else if (item == Items.DIAMOND_HOE || item == Items.NETHERITE_HOE) {
             return module.hoePlan.get().plan();
+        } else if (item == Items.SHEARS) {
+            return module.shearsPlan.get().plan();
         }
 
         // Armor
