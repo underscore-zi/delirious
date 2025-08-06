@@ -34,6 +34,8 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new AutoAnvil());
         //Modules.get().add(new ChatPoC());
         Modules.get().add(new BonemealFarmer());
+        Modules.get().add(new ElytraReplace());
+        Modules.get().add(new RocketCrafter());
     }
 
     @Override
