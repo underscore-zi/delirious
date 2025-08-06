@@ -8,6 +8,7 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.SlotUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
@@ -32,9 +33,10 @@ public class RocketCrafter extends Module {
         super(Addon.CATEGORY, "RockerCrafter", "Automatically crafts fd3 rockets");
     }
     final int DELAY_BETWEEN_ACTIONS = 5;
-    BlockPos lastShulkerInteract = null;
+    BlockPos lastInteract = null;
     BlockPos paperShulker = null;
     BlockPos gpShulker = null;
+    BlockPos craftingTable = null;
     @Override
     public void onActivate() {
         // Initialization logic if needed
@@ -77,13 +79,23 @@ public class RocketCrafter extends Module {
     }
 
     public boolean handleCraftingScreen(CraftingScreen screen, CraftingScreenHandler handler) {
+        if(lastInteract != null) {
+            craftingTable = lastInteract;
+        }
+
         if(areSlotsEmpty(handler.getInputSlots())) {
-            handleCrafting(screen, handler);
+            if(!handleCrafting(screen, handler)) {
+                // if we can't craft anything, and slots are empty then we are done
+                screenDone = true;
+                screen.close();
+            }
             return true;
-        } else {
+        } else if (handler.getOutputSlot().hasStack()) {
             InvUtils.shiftClick().slotId(handler.getOutputSlot().id);
             return true;
         }
+
+        return false;
     }
 
     public boolean handleCrafting(CraftingScreen screen, CraftingScreenHandler handler) {
@@ -150,12 +162,62 @@ public class RocketCrafter extends Module {
 
     @EventHandler
     public void onRender(Render3DEvent event) {
-        if(paperShulker != null) {
-            event.renderer.box(paperShulker, new Color(200,200,200, 50), new Color(200,200,200, 150), ShapeMode.Both, 0);
+        if(mc.currentScreen != null) return;
+
+        var hasFullPaper = InvUtils.find(Items.PAPER).count() == 27 * 64;
+        var hasPaper = InvUtils.find(Items.PAPER).count() == 9 * 64;
+        var hasGP = InvUtils.find(Items.GUNPOWDER).count() == 27 * 64;
+        var hasRockets = InvUtils.find(Items.FIREWORK_ROCKET).count() == 27 * 64;
+        var hasSugarcane = InvUtils.find(Items.SUGAR_CANE).count() == 27 * 64;
+
+
+        if(hasPaper && hasGP) {
+            renderCrafting(event);
+        } else if(hasPaper) {
+            renderGP(event);
+        } else if(hasGP) {
+            renderPaper(event);
+        } else if(hasRockets) {
+            renderGP(event);
+        } else if(hasSugarcane) {
+            renderCrafting(event);
+        } else if(hasFullPaper) {
+            renderPaper(event);
+        } else {
+            renderGP(event);
+            renderPaper(event);
+        }
+    }
+
+    public boolean renderBlock(Render3DEvent event, BlockPos pos, Color base) {
+        if(pos == null) return true;
+        if(!PlayerUtils.isWithin(pos, 32)) return false;
+
+        if(mc.world.getBlockState(pos).getBlock().asItem().equals(Items.AIR)) {
+            return false;
         }
 
-        if(gpShulker != null) {
-            event.renderer.box(gpShulker, new Color(50,50,50, 50), new Color(50,50,50, 150), ShapeMode.Both, 0);
+        var innerColor = new Color(base.r, base.g, base.b, 30);
+        var outerColor = new Color(base.r, base.g, base.b, 150);
+        event.renderer.box(pos, innerColor, outerColor, ShapeMode.Both, 0);
+        return true;
+    }
+
+    public void renderGP(Render3DEvent event) {
+        if(!renderBlock(event, gpShulker, new Color(50,50,50))) {
+            gpShulker = null;
+        }
+    }
+
+    public void renderPaper(Render3DEvent event) {
+        if(!renderBlock(event, paperShulker, new Color(200, 200, 200))) {
+            paperShulker = null;
+        }
+    }
+
+    public void renderCrafting(Render3DEvent event) {
+        if(!renderBlock(event, craftingTable, new Color(232,151,85))) {
+            craftingTable = null;
         }
     }
 
@@ -189,7 +251,7 @@ public class RocketCrafter extends Module {
                 for(int i=0;i<27;i++) {
                     InvUtils.shiftClick().slotId(gunpowder.get(i).id);
                 }
-                gpShulker = lastShulkerInteract;
+                gpShulker = lastInteract;
                 delay = DELAY_BETWEEN_ACTIONS * 4;
                 return true;
             } else if (sugarcane.size() == 27) {
@@ -197,14 +259,14 @@ public class RocketCrafter extends Module {
                     InvUtils.shiftClick().slotId(sugarcane.get(i).id);
                 }
 
-                paperShulker = lastShulkerInteract;
+                paperShulker = lastInteract;
                 delay = DELAY_BETWEEN_ACTIONS * 4;
                 return true;
             } else if (paper.size() >= 9 && ownPaper.isEmpty()) {
                 for(int i=0;i<9;i++) {
                     InvUtils.shiftClick().slotId(paper.get(i).id);
                 }
-                paperShulker = lastShulkerInteract;
+                paperShulker = lastInteract;
                 delay = DELAY_BETWEEN_ACTIONS * 4;
                 return true;
             }
@@ -227,7 +289,7 @@ public class RocketCrafter extends Module {
     @EventHandler
     public void onInteract(InteractBlockEvent event) {
         var pos = event.result.getBlockPos();
-        final Item[] shulkers = {
+        final Item[] interactables = {
             Items.SHULKER_BOX,
             Items.BLACK_SHULKER_BOX,
             Items.BLUE_SHULKER_BOX,
@@ -244,27 +306,17 @@ public class RocketCrafter extends Module {
             Items.PURPLE_SHULKER_BOX,
             Items.RED_SHULKER_BOX,
             Items.WHITE_SHULKER_BOX,
-            Items.YELLOW_SHULKER_BOX
+            Items.YELLOW_SHULKER_BOX,
+
+            Items.CRAFTING_TABLE
         };
 
         var item = mc.world.getBlockState(pos).getBlock().asItem();
-        for (Item shulker : shulkers) {
-            if (item == shulker) {
-                lastShulkerInteract = pos;
+        for (Item i : interactables) {
+            if (item == i) {
+                lastInteract = pos;
                 return;
             }
-        }
-    }
-
-    @EventHandler
-    public void onBreak(BreakBlockEvent event) {
-        var pos = event.blockPos;
-        if(pos == gpShulker) {
-            gpShulker = null;
-        }
-
-        if(pos == paperShulker) {
-            paperShulker = null;
         }
     }
 
