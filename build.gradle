@@ -8,7 +8,26 @@ base {
     archivesName = "delirious-MC${project.minecraft_version}"
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
 repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
     maven {
         name = "meteor-maven"
         url = uri("https://maven.meteordev.org/releases")
@@ -34,7 +53,21 @@ dependencies {
 
     // Meteor
     modImplementation "meteordevelopment:meteor-client:${project.minecraft_version}-SNAPSHOT"
-    modCompileOnly("meteordevelopment:baritone:${project.baritone_version}-SNAPSHOT")
+    //modCompileOnly("meteordevelopment:baritone:${project.baritone_version}-SNAPSHOT")
+    modCompileOnly files('.local/libs/baritone-api-fabric-1.11.1-5-g9b0eb784-dirty.jar')
+    modCompileOnly("maven.modrinth:xaeros-world-map:1.39.2_Fabric_1.21.4")
+    modCompileOnly("maven.modrinth:xaeros-minimap:25.0.0_Fabric_1.21.4")
+
+
+    implementation 'com.google.code.gson:gson:2.13.1'
+    //modImplementation "maven.modrinth:xaeroplus:${project.xaeroplus_version}"
+    // XaeroWorldMap
+    //modImplementation "maven.modrinth:xaeros-world-map:${project.xaeros_worldmap_version}"
+    // XaeroMinimap
+    //modImplementation "maven.modrinth:xaeros-minimap:${project.xaeros_minimap_version}"
+    // lenni
+    //modImplementation "net.lenni0451:LambdaEvents:2.4.2"
+    //modImplementation "com.github.ben-manes.caffeine:caffeine:3.1.8"
 }
 
 tasks {
