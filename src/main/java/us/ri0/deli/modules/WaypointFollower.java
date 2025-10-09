@@ -91,7 +91,7 @@ public class WaypointFollower extends Module {
 
         var baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
         var elytra = baritone.getElytraProcess();
-        if(!elytra.isActive()) {
+        if(elytra.isActive()) {
             baritone.getCommandManager().execute("stop");
         }
 
