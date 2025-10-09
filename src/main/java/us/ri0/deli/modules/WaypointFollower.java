@@ -119,10 +119,9 @@ public class WaypointFollower extends Module {
                     return 275; // world() doesn't have a maxY() method?
                 } else if (ctx.playerFeet().getY() > 128) {
                     return ctx.playerFeet().getY();
-                } else {
-                    return 65;
                 }
             }
+            return 65;
         }
         return allowAboveBuild ? 336 : 65;
     }
