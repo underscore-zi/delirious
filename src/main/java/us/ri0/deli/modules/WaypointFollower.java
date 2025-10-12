@@ -138,6 +138,7 @@ public class WaypointFollower extends Module {
 
     private SortedMap<Long, BetterBlockPos> getTemporaryWaypoints(long afterTs) {
         var world = getXaerosWorld();
+        if(world == null) return Collections.emptySortedMap();
         var sets = world.getIterableWaypointSets();
 
         SortedMap<Long, BetterBlockPos> wps = new TreeMap<>();
@@ -161,6 +162,7 @@ public class WaypointFollower extends Module {
 
     private void clearTemporaryWaypoints() {
         var world = getXaerosWorld();
+        if(world == null) return;
         var sets = world.getIterableWaypointSets();
 
         for(var set : sets) {
