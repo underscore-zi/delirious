@@ -8,6 +8,7 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.dimension.DimensionTypes;
 import us.ri0.deli.Addon;
 import xaero.common.minimap.waypoints.Waypoint;
@@ -22,6 +23,22 @@ public class WaypointFollower extends Module {
         .name("land-when-finished")
         .description("Attempt to land when there are no more waypoints. Otherwise will hover at last waypoint.")
         .defaultValue(true)
+        .build()
+    );
+    private final Setting<Boolean> isChunkLoading = sgGeneral.add(new BoolSetting.Builder()
+        .name("chunk-loading")
+        .description("Focus on loading chunks along the path, not on getting to the waypoint.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Integer> chunkLoadRadius = sgGeneral.add(new meteordevelopment.meteorclient.settings.IntSetting.Builder()
+        .name("chunk-load-radius")
+        .description("Radius of chunks to load around the player. If set too high it will get stuck waiting.")
+        .defaultValue(5)
+        .min(1)
+        .max(12)
+        .visible(isChunkLoading::get)
         .build()
     );
 
@@ -185,6 +202,19 @@ public class WaypointFollower extends Module {
         return s.getWorldManager().getCurrentWorld();
     }
 
+    private boolean isLoadedAround(ChunkPos center, int radius) {
+        var manager = mc.world.getChunkManager();
+        for(int dx=-radius;dx<=radius;dx++) {
+            for(int dz=-radius;dz<=radius;dz++) {
+                if(!manager.isChunkLoaded(center.x + dx, center.z + dz)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
     private class WaypointIterator implements Iterator<BetterBlockPos> {
         Queue<BetterBlockPos> waypoints = new LinkedList<>();
         BetterBlockPos last = null;
@@ -208,14 +238,46 @@ public class WaypointFollower extends Module {
 
         @Override
         public BetterBlockPos next() {
+            int radius = chunkLoadRadius.get();
             if(!landWhenFinished.get() && waypoints.isEmpty()) {
                 return last;
             }
 
-            last = waypoints.poll();
+            if(last == null) {
+                last = waypoints.poll();
+            }
+
+            if(isChunkLoading.get()) {
+                // Circle this point until chunks are loaded
+                if(!isLoadedAround(new ChunkPos(last), radius)) {
+                    return last;
+                }
+
+                // If the next point is too far away, create an intermediate waypoint we can use
+                // to hold back the player if chunk loading is slow.
+
+                var next = waypoints.peek();
+                var dX = Math.abs(mc.player.getX() - next.getX());
+                var dZ = Math.abs(mc.player.getZ() - next.getZ());
+
+                if(dX <= radius * 16 * 2 && dZ <= radius * 16 * 2) {
+                    // Close enough, take it off the queue and hand it back
+                    last = waypoints.poll();
+                    return last;
+                }
+
+                double angle = Math.atan2(next.getZ() - mc.player.getZ(), next.getX() - mc.player.getX());
+                double newX = mc.player.getX() + Math.cos(angle) * radius * 16 * 0.9 * 2;
+                double newZ = mc.player.getZ() + Math.sin(angle) * radius * 16 * 0.9 * 2;
+                last = new BetterBlockPos((int)newX, next.getY(), (int)newZ);
+
+                return last;
+            }
+
             if(waypoints.isEmpty() && landWhenFinished.get()) {
                 return new BetterBlockPos(last.getX(), 65, last.getZ());
             }
+
             return last;
         }
     }
