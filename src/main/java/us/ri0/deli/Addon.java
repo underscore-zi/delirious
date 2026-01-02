@@ -39,6 +39,11 @@ public class Addon extends MeteorAddon {
 
         Modules.get().add(new WaypointFollower());
         Hud.get().register(EntityCounter.INFO);
+        Modules.get().add(new BetterShulkerViewer());
+        Modules.get().add(new GrimScaffold());
+        Modules.get().add(new ItemFrameESP());
+        Modules.get().add(new InstaAura());
+        Modules.get().add(new TeleportModuleControl());
     }
 
     @Override
